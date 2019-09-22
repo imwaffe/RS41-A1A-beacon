@@ -12,14 +12,14 @@
 
 
 //********** RTTY
-#define SEND_RTTY 1 // Set to 0 to disable RTTY
+#define SEND_RTTY 0 // Set to 0 to disable RTTY
 //**************RTTY Data Format**********************
 // $$$<callsign>,<frame#>,[<hh:mm:ss>],[<latitude>,<longitude>],[<height>],[<speed>],[<rtty comment>],[<radio chip temperature (°C)>],[<battery voltage>],[<used gps satellites>],[<good gps datasets>,<bad gps datasets>,<gps fix flags>]*<CRC>
-#define RTTY_CALLSIGN "NOCALL" // put your RTTY callsign here, max. 15 characters
+#define RTTY_CALLSIGN "IZ2ZZS/B" // put your RTTY callsign here, max. 15 characters
 #define SEND_RTTY_TIME 1
 #define SEND_RTTY_LATLON 1
 #define SEND_RTTY_HEIGHT 1
-#define SEND_RTTY_SPEED 1
+#define SEND_RTTY_SPEED 0
 #define SEND_RTTY_MESSAGE 1
 #define SEND_RTTY_TEMPERATURE 1
 #define SEND_RTTY_VOLTAGE 1
@@ -31,10 +31,10 @@
 // World Wide Locator pairs (precision)
 #define PAIR_COUNT 4 // max. 6 (12 characters WWL)
 
-#define RTTY_FREQUENCY  434.500f //Mhz middle frequency
+#define RTTY_FREQUENCY  432.486f //Mhz middle frequency
 
 //************RTTY Shift*********************** si4032
-#define RTTY_DEVIATION 0x2	// RTTY shift = RTTY_DEVIATION x 270Hz
+#define RTTY_DEVIATION 0x1	// RTTY shift = RTTY_DEVIATION x 270Hz
 
 //************RTTY Speed*********************** si4032
 #define RTTY_SPEED  75 // RTTY baudrate
@@ -70,20 +70,20 @@
 #define APRS_FREQUENCY  432.500f //Mhz middle frequency
 
 #define APRS_COMMENT " Hello from the sky!"
-#define RTTY_TO_APRS_RATIO 5 //transmit APRS packet with each x RTTY packet
+//#define RTTY_TO_APRS_RATIO 5 //transmit APRS packet with each x RTTY packet
 
 //********** Morse (CW)
 #define SEND_MORSE 1 // Set to 0 to disable CW
 #define MORSE_PREFIX "DE NOCALL" // Start of the message
 #define SEND_MORSE_WWL 1 // in <WW-locator>
-#define SEND_MORSE_HEIGHT 0 // ASL <altitude>
-#define SEND_MORSE_VOLTAGE 0 // bat <voltage>
+#define SEND_MORSE_HEIGHT 1 // ASL <altitude>
+#define SEND_MORSE_VOLTAGE 1 // bat <voltage>
 #define MORSE_SUFFIX " +" // AR^ (end of transmission)
-#define MORSE_WPM 20 // Speed in words per minute
-#define RTTY_TO_MORSE_RATIO 10 // Transmit morse message with each x RTTY packet
+#define MORSE_WPM 13 // Speed in words per minute
+#define RTTY_TO_MORSE_RATIO 1 // Transmit morse message with each x RTTY packet
 
 //********* power definition**************************
-#define TX_POWER  0 // PWR 0...7 0- MIN ... 7 - MAX
+#define TX_POWER  7 // PWR 0...7 0- MIN ... 7 - MAX
 // 0 --> -1dBm
 // 1 --> 2dBm
 // 2 --> 5dBm
@@ -96,14 +96,14 @@
 
 // Switch sonde ON/OFF via Button
 // If this is a flight you might prevent sonde from powered off by button
-#define ALLOW_DISABLE_BY_BUTTON 1
+#define ALLOW_DISABLE_BY_BUTTON 0
 
 //********** Frame Delay in msec**********************
-#define TX_DELAY  5000
+#define TX_DELAY  30000
 
 // Enable/disable LED blinking
 // when set to 0, LEDs will stop blinking approx. 10 minutes after powering on the sonde
-#define LED_ENABLED 1
+#define LED_ENABLED 0
 
 #endif
 

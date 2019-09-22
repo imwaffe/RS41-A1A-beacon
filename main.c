@@ -1,3 +1,4 @@
+
 // STM32F100 and SI4032 RTTY transmitter
 // released under GPL v.2 by anonymous developer
 // enjoy and have a nice day
@@ -19,7 +20,6 @@
 #include "radio.h"
 #include "ublox.h"
 #include "delay.h"
-#include "aprs.h"
 #include "locator.h"
 #include "morse.h"
 ///////////////////////////// test mode /////////////
@@ -53,14 +53,13 @@ volatile unsigned int tx_on_delay;
 volatile unsigned char tx_enable = 0;
 rttyStates send_rtty_status = rttyZero;
 volatile char *rtty_buf;
-volatile uint16_t button_pressed = 0;
+volatile uint16_t button_pressed = 1;
 volatile uint8_t disable_armed = 0;
 
 void collect_telemetry_data(void);
 void send_rtty_packet(void);
 uint16_t gps_CRC16_checksum (char *string);
-void send_aprs_packet(void);
-void send_morse_message(void);
+void send_morse_message(char *message);
 
 
 /**
@@ -80,9 +79,6 @@ void TIM2_IRQHandler(void) {
   if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
     TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 
-    if (aprs_is_active()){
-      aprs_timer_handler();
-    } else {
       if (ALLOW_DISABLE_BY_BUTTON){
         if (ADCVal[1] > adc_bottom){
           button_pressed++;
@@ -137,7 +133,6 @@ void TIM2_IRQHandler(void) {
         }
         cun = 200;
       }
-    }
 
     if (!LED_ENABLED && led_enabled && !--led_timeout) led_enabled = 0;
 
@@ -182,24 +177,21 @@ int main(void) {
   tx_on = 0;
   tx_enable = 1;
 
-  aprs_init();
-  uint8_t rtty_before_aprs_left = RTTY_TO_APRS_RATIO;
+  spi_init();
+  radio_set_tx_frequency(RTTY_FREQUENCY);
+  radio_rw_register(0x71, 0x00, 1);
+  init_timer(RTTY_SPEED);
+
   uint8_t morse_countdown = RTTY_TO_MORSE_RATIO;
 
   while (1) {
     if (tx_on == 0 && tx_enable) {
-      if (rtty_before_aprs_left){
-        if (SEND_MORSE && !--morse_countdown) {
-          send_morse_message();
+        if (SEND_MORSE && (!SEND_RTTY || !--morse_countdown)) {
+          send_morse_message("VVV TEST DE IZ2ZZS/B 30MW");
           morse_countdown = RTTY_TO_MORSE_RATIO;
         }
         if (SEND_RTTY) send_rtty_packet();
         else _delay_ms(TX_DELAY);
-        rtty_before_aprs_left--;
-      } else {
-        rtty_before_aprs_left = RTTY_TO_APRS_RATIO;
-        if (SEND_APRS) send_aprs_packet();
-      }
 
     } else {
       NVIC_SystemLPConfig(NVIC_LP_SEVONPEND, DISABLE);
@@ -275,32 +267,34 @@ uint16_t gps_CRC16_checksum(char *string) {
   return crc;
 }
 
-void send_aprs_packet(void) {
-  radio_enable_tx();
-  collect_telemetry_data();
-  USART_Cmd(USART1, DISABLE);
-  aprs_send_position(gpsData, si4032_temperature, voltage);
-  USART_Cmd(USART1, ENABLE);
-  radio_disable_tx();
-}
+void send_morse_message(char *message) {
 
-void send_morse_message(void) {
   tx_enable = 0;
+
+  radio_rw_register(0x73, 0, 1);
+
+  radio_enable_tx();
+  _delay_ms(5000);
+  radio_inhibit_tx();
+  _delay_ms(1200/MORSE_WPM*7);
+
   collect_telemetry_data();
-  int messageLength = sprintf(buffer, "%s", MORSE_PREFIX);
+  int messageLength = sprintf(buffer, "%s", message);
   if (SEND_MORSE_WWL)
     messageLength += sprintf(buffer + messageLength, " IN %s", locator);
   if (SEND_MORSE_HEIGHT)
-    messageLength += sprintf(buffer + messageLength, " ASL %ld", (gpsData.alt_raw / 1000));
+    messageLength += sprintf(buffer + messageLength, " ASL %ldm", (gpsData.alt_raw / 1000));
   if (SEND_MORSE_VOLTAGE)
-    messageLength += sprintf(buffer + messageLength, " BAT %d.%02d", voltage/100, voltage-voltage/100*100);
+    messageLength += sprintf(buffer + messageLength, " VBAT %d.%02dV", voltage/100, voltage-voltage/100*100);
   messageLength += sprintf(buffer + messageLength, "%s", MORSE_SUFFIX);
 
-  // Set CW offset
-  radio_rw_register(0x73, 1, 1);
-
   sendMorse(buffer);
-  _delay_ms(2000);
+
+  _delay_ms(1200/MORSE_WPM*7);
+  radio_enable_tx();
+  _delay_ms(30000);
+  radio_inhibit_tx();
+
   tx_enable = 1;
 }
 
