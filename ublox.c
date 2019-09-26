@@ -64,6 +64,14 @@ uBloxChecksum ublox_calc_checksum(const uint8_t msgClass, const uint8_t msgId, c
   return ck;
 }
 
+uint8_t ublox_get_seconds(){
+	uint8_t secs;
+	__disable_irq();
+	secs = currentGPSData.seconds;
+	__enable_irq();
+	return secs;
+}
+
 void ublox_get_last_data(GPSEntry * gpsEntry){
   __disable_irq();
   memcpy(gpsEntry, &currentGPSData, sizeof(GPSEntry));
