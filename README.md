@@ -71,9 +71,9 @@ Have a nice day ;)
 # TODO
  * Adding support for EmbiTZ IDE
  * Adding support for platform independent IDE Eclipse
- * More APRS config options
  * Temperature and moisture sensor
  * Pressure sensor
  * implementing protocol for using external devices on extension header
  * Configuration via extension header (serial connection) without need for reflashing firmware
  * Possibly add configuration "wireless" using RFID loop present in sonde
+ * Adding the possibility to program messages structure via serial communication
