@@ -1,6 +1,9 @@
-# RS41HUP (Ham Use Project)
-Firmware for RS41 for HAM use<br>
-It is possible to recycle RS41-SGP sondes for amateur radio use without any electrical changes! You just have to build a new firmware (this one) and apply it via a cheap adaptor "ST-Linkv2". Modified sonde now transmits on defineable frequenca in 70cm band GPS and telemetry data in FSK RTTY format which is used by HAB projects and additionally it transmits APRS packets on a seperately defineable TX frequency.
+# RS41HUP (Ham Use Project) Beacon version
+Alternative firmware version based on DF8OE's firmware for ham radio use.
+I felt the necessity to modify the original firmware in order to make a versatile, reliable and light firmware to allow the usage of the RS41 radiosondes made by Vaisala as ham radio beacons using A1A modulation (CW).
+APRS-related code has been removed, RTTY is still present (for now).
+
+Please note that a lot of refactoring is still needed, and that config.h file still contains settings that won't have any effect on the actual way the radiosonde beacon works (eg: RTTY_TO_MORSE_RATIO won't have any effect at all, since it won't transmit via RTTY).
 
 Released under GPL v2
 
@@ -26,7 +29,6 @@ make
 # Configuration
 All configs in ```config.h```
 
-* ```SEND_RTTY``` Optionally send RTTY packet every ```TX_DELAY``` ms
 * ```SEND_RTTY_<value>``` Include <value> into the RTTY packet
 * ```RTTY_CALLSIGN``` RTTY callsign
 * ```RTTY_COMMENT``` RTTY comment
@@ -37,14 +39,7 @@ All configs in ```config.h```
 * ```RTTY_SPEED``` RTTY speed in bauds
 * ```RTTY_7BIT``` Use 7 bit RTTY
 * ```RTTY_USE_2_STOP_BITS``` Use 2 stop bits
-* ```SEND_APRS``` Optionally send APRS packet every ```TX_DELAY``` * ```RTTY_TO_APRS_RATIO``` ms
-* ```APRS_CALLSIGN``` APRS callsign, 6 characters. If your callsign is shorter add spaces
-* ```APRS_SSID``` APRS SSID
-* ```APRS_COMMENT``` APRS comment
-* ```APRS_FREQUENCY``` APRS frequency in MHz
-* ```RTTY_TO_APRS_RATIO``` Number of RTTY frames between each APRS frame
-* ```SEND_MORSE``` Optionally send Morse message every ```TX_DELAY``` * ```RTTY_TO_MORSE_RATIO``` ms
-* ```MORSE_PREFIX``` Start of the Morse message (DE <callsign>)
+
 * ```SEND_MORSE_<value>``` Include <value> into the Morse message
 * ```MORSE_SUFFIX``` Optional end of the Morse message (ar^)
 * ```MORSE_WPM``` Morse speed in words per minute
@@ -69,6 +64,8 @@ Have a nice day ;)
      * Optionally turn off RTTY or APRS
      * Optionally turn off LED blinking
      * Added Morse (CW) support
+ * 22.09.2019 - Removed (almost) all APRS-related code
+ * 26.09.2019 - Added function to return GPS seconds, used in main() to start CW transmission at given seconds
 
 
 # TODO
